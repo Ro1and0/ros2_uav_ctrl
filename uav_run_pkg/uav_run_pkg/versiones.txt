@@ -1,0 +1,30 @@
+VERSIONES 
+uav_f es siempre igual a la ultima version uav_f_vn
+_v5: 22/03/2024
+Adaptaciones para trabajar con el projecto del 5GWW. Envia y recibe informacion por unos topicos a mqtt. Cuando recibe una nueva posicion por mqtt manda al drone a esa nueva posicion. Si no recibe nada, de todos modos estüa programado que se vaya a una nueva posicion despues de 61 seg despues del takeoff. Loiter y ROI aun no funcionan. 
+
+_v4: 04/03/2024
+Se agregaron los servicios: ROI, ROI_off, Loiter_turns de mavlink  con lo que puede indicarse al dron que apunte hacia una position ROI, desactivar esta posicion y que apunte a la direcciüon de movimiento, y que haga círculos alrededor de una posicion gps con algura referenciada respecto a la altura home, respectivamente. Se agregó una instrucción para leer el tiempo en segundos e imprimirlo al inicio del main. Se modifica la mision. primero hace los primeros 2wp del poligono, se activa ROI hacia la pos home, se hacen los siguientes 2wp. Giros de 3m radio alrededor de home con ROI off durante los 1os 10s y ROI=wp2 durante los siguientes 10s. Ultimos 10s ROI off otra vez. Landing (aunque no haya terminado las 3 vueltas.) 
+Compilación correcta, falta probar RT.
+
+uav_f_v3:
+Se agregó un publisher topic_ping_ros, que publica en el topico ping/ros cada vez que se lee la poscion global gps. Este topico tiene interface std_msg/msg/String para que sea facil compartir con mqtt. Esta version se puede probar con el ejemplo de cliente mqtt: 1 correr el broker mosquito, 2 correr el cliente mqtt, 3 correr mavros, 4 correr uav_f, al conectarse mavros comienza a actualizarse ping/ros y el cliente mqtt recibe ese msg y lo regresa al topico pong/ros. 5 hacer echo en el pong/ros y leer la pos gps.
+
+
+uav_f_old2 13:19 29/01/2024
+Se modificó para que todos los topicos y nodos tuvieran el namespace de raiz uavLeader. Para cambar namespace se cambia comando 
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PROBLEMAS A RESOLVER:
+
+29/01/2024
+1 si tengo 2 OBC en network con ROS_DOMAIN_ID y una de ellas está conectada a un FCU, y hago ros2 launch mavros apm.launch en ambas resulta que ambas se connectan al FCU. Entonces no habría independencia en los FCU. Creo que se tiene que correr un solo launch en alguna de las OBC y desde este decirle como se conecta cada FCU. 
+SOL. Se modifico el sys_id de cada drone, de esta forma el launch de mavros es personalizado para cada drone tambien. 
+
+uav_f_3:
+1 hacer que cuando este cerca de una wp cambie al siguiente
+2 decirle que solo si llega a la altura del takeoff pase al siguiente paso
+3 que si no se hizo el armado vuelva a solicitar el guided o algo asi,
+4 que si no se hace el takeoff vuelva a pedir el armado o algo asi.
